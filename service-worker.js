@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v8"; // Change le nom du cache pour forcer la mise à jour
+const CACHE_NAME = "pwa-cache-v9"; // Change le nom du cache pour forcer la mise à jour
 const FILES_TO_CACHE = [
     "index.html",
     "style.css",
@@ -37,7 +37,6 @@ const FILES_TO_CACHE = [
     "vindra-alayrac.png",
     "vindrac.png",
     "vindrac-alayrac.html",
-
     "icon-512x512.png"
 ];
 
