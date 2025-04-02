@@ -43,14 +43,27 @@ const FILES_TO_CACHE = [
 // Installation : mise en cache des fichiers
 self.addEventListener("install", (event) => {
     console.log("Service Worker : Installation...");
+
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(FILES_TO_CACHE);
+            return cache.addAll(FILES_TO_CACHE.map(url =>
+                fetch(url, { cache: "no-store" }) // Vérifier si le fichier existe
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Erreur 404 : ${url}`);
+                        return url;
+                    })
+                    .catch(error => {
+                        console.warn("Service Worker : Fichier introuvable, ignoré ->", error.message);
+                        return null;
+                    })
+            )).then(files => {
+                return cache.addAll(files.filter(url => url !== null)); // Ajoute seulement les fichiers trouvés
+            });
         })
     );
+
     self.skipWaiting();
 });
-
 // Activation : suppression des anciens caches
 self.addEventListener("activate", (event) => {
     console.log("Service Worker : Activation...");
