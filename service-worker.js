@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v4"; // Change le nom du cache pour forcer la mise à jour
+const CACHE_NAME = "pwa-cache-v5"; // Change le nom du cache pour forcer la mise à jour
 const FILES_TO_CACHE = [
     "index.html",
     "style.css",
@@ -40,6 +40,13 @@ self.addEventListener("activate", (event) => {
 // Interception des requêtes pour servir les fichiers en cache
 self.addEventListener("fetch", (event) => {
     console.log("Service Worker : Fetch -> ", event.request.url);
+
+    // Si la requête est une iframe externe, ne pas la rediriger vers index.html
+    if (event.request.destination === "iframe") {
+        console.log("Service Worker : Ignorer iframe -> ", event.request.url);
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then((response) => {
             if (response) {
