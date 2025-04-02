@@ -1,13 +1,26 @@
-const CACHE_NAME = "pwa-cache-v1";
+const CACHE_NAME = "pwa-cache-v3"; // Nouveau cache pour éviter l'ancien
 const FILES_TO_CACHE = [
-    "/",
-    "/index.html",
-    "/style.css",
-    "/app.js",
-    "/manifest.json",
-    "/icon-192x192.png",
-    "/icon-512x512.png"
+    "index.html",
+    "style.css",
+    "app.js",
+    "manifest.json",
+    "icon-192x192.png",
+    "icon-512x512.png"
 ];
+
+// Installation du Service Worker et mise en cache des fichiers
+self.addEventListener("install", (event) => {
+    console.log("Service Worker : Installation...");
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(FILES_TO_CACHE).catch((error) => {
+                console.error("Erreur lors du caching :", error);
+            });
+        })
+    );
+    self.skipWaiting();
+});
+
 
 // Installation du Service Worker et mise en cache des fichiers
 self.addEventListener("install", (event) => {
