@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v6"; // Change le nom du cache pour forcer la mise à jour
+const CACHE_NAME = "pwa-cache-v8"; // Change le nom du cache pour forcer la mise à jour
 const FILES_TO_CACHE = [
     "index.html",
     "style.css",
