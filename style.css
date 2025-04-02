@@ -1,0 +1,11 @@
+/* Ajoute un peu de style */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+iframe{
+    width: 90%;
+    height: 70vh;
+}
