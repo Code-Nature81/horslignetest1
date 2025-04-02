@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v3"; // Nouveau cache pour éviter l'ancien
+const CACHE_NAME = "pwa-cache-v4"; // Change le nom du cache pour forcer la mise à jour
 const FILES_TO_CACHE = [
     "index.html",
     "style.css",
@@ -8,43 +8,49 @@ const FILES_TO_CACHE = [
     "icon-512x512.png"
 ];
 
-// Installation du Service Worker et mise en cache des fichiers
+// Installation : mise en cache des fichiers
 self.addEventListener("install", (event) => {
     console.log("Service Worker : Installation...");
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(FILES_TO_CACHE).catch((error) => {
-                console.error("Erreur lors du caching :", error);
-            });
+            return cache.addAll(FILES_TO_CACHE);
         })
     );
     self.skipWaiting();
 });
 
-// Activation et suppression des anciennes caches
+// Activation : suppression des anciens caches
 self.addEventListener("activate", (event) => {
+    console.log("Service Worker : Activation...");
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
-                        console.log("Suppression de l'ancienne cache :", cache);
+                        console.log("Service Worker : Suppression de l'ancien cache", cache);
                         return caches.delete(cache);
                     }
                 })
             );
         })
     );
-    self.clients.claim(); // Prend le contrôle immédiatement
+    self.clients.claim();
 });
 
-// Interception des requêtes réseau et réponse avec le cache
+// Interception des requêtes pour servir les fichiers en cache
 self.addEventListener("fetch", (event) => {
+    console.log("Service Worker : Fetch -> ", event.request.url);
     event.respondWith(
         caches.match(event.request).then((response) => {
-            return response || fetch(event.request).catch(() => {
-                // Optionnel : Retourner une page hors ligne custom si l'utilisateur est offline
-                return caches.match("/index.html");
+            if (response) {
+                console.log("Service Worker : Chargement depuis le cache -> ", event.request.url);
+                return response;
+            }
+            console.log("Service Worker : Fichier non en cache, chargement depuis le réseau -> ", event.request.url);
+            return fetch(event.request).catch(() => {
+                if (event.request.mode === "navigate") {
+                    return caches.match("index.html");
+                }
             });
         })
     );
