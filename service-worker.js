@@ -21,18 +21,6 @@ self.addEventListener("install", (event) => {
     self.skipWaiting();
 });
 
-
-// Installation du Service Worker et mise en cache des fichiers
-self.addEventListener("install", (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log("Mise en cache des fichiers...");
-            return cache.addAll(FILES_TO_CACHE);
-        })
-    );
-    self.skipWaiting(); // Activation immédiate du SW
-});
-
 // Activation et suppression des anciennes caches
 self.addEventListener("activate", (event) => {
     event.waitUntil(
