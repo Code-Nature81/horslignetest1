@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v9"; // Change le nom du cache pour forcer la mise à jour
+const CACHE_NAME = "pwa-cache-v10"; // Change le nom du cache pour forcer la mise à jour
 const FILES_TO_CACHE = [
     "index.html",
     "style.css",
@@ -46,24 +46,24 @@ self.addEventListener("install", (event) => {
 
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(FILES_TO_CACHE.map(url =>
-                fetch(url, { cache: "no-store" }) // Vérifier si le fichier existe
-                    .then(response => {
-                        if (!response.ok) throw new Error(`Erreur 404 : ${url}`);
-                        return url;
-                    })
-                    .catch(error => {
-                        console.warn("Service Worker : Fichier introuvable, ignoré ->", error.message);
-                        return null;
-                    })
-            )).then(files => {
-                return cache.addAll(files.filter(url => url !== null)); // Ajoute seulement les fichiers trouvés
-            });
+            return Promise.all(
+                FILES_TO_CACHE.map(url =>
+                    fetch(url, { cache: "no-store" }) // Vérifie si le fichier existe
+                        .then(response => {
+                            if (!response.ok) throw new Error(`Erreur 404 : ${url}`);
+                            return cache.put(url, response.clone()); // Met en cache si OK
+                        })
+                        .catch(error => {
+                            console.warn("Service Worker : Fichier introuvable, ignoré ->", error.message);
+                        })
+                )
+            );
         })
     );
 
     self.skipWaiting();
 });
+
 // Activation : suppression des anciens caches
 self.addEventListener("activate", (event) => {
     console.log("Service Worker : Activation...");
